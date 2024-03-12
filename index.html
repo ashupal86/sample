@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello, World!</title>
+</head>
+<body>
+    <table>
+        <tr>
+            {% for head in heading%}
+            <th>{{head}}</th>
+
+            {% endfor %}
+        </tr>
+        {% for row in data %}
+        <tr>
+            {% for col in row %}
+            <td>{{col}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
