@@ -1,0 +1,33 @@
+{% extends 'base.html'%}
+{% block content%}
+
+<div class="login_form">
+    <form action="/login" method="post">
+        <h2>Login</h2>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="/register">Register</a></p>
+
+</div>
+<div class="registration_form">
+    <form action="{{url_for('register')}}" method="post">
+        <h2>Register</h2>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" required>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" required>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="/login">Login</a></p>
+</div>
+
+
+
+{%endblock%}
