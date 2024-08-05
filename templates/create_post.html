@@ -1,39 +1,45 @@
-{% extends 'base.html'%}
-{% block head%}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-  {%endblock%}
-{% block title%}Create Post{%endblock%}
+{% extends 'base.html' %}
 
-{% block content%}
+{% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
 
+{% block title %}
+    Create Post
+{% endblock %}
+
+{% block content %}
 <div class="container-fluid" style="width: 100%;">
     <div class="row">
         <div class="col-md-9">
             <div class="post_form">
-                <form action="/create_post" method="post">
+                <form action="{{url_for('create_post')}}" method="post">
                     <h2>Create Post</h2>
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
+                        <input type="text" class="form-control" id="title" name="post_title" required>
                     </div>
                     <div class="form-group">
                         <label for="content">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        <textarea class="form-control" id="content" name="post_content" rows="10" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Tags</label>
+                        <input type="text" class="form-control" id="tags" name="tags">
                     </div>
                     <button type="submit" class="btn btn-primary">Create Post</button>
                 </form>
             </div>
         </div>
-        <div class="col-md-3" >
+        <div class="col-md-3">
             <div class="row">
                 <div class="col-md-9 offset-md-3">
                     <div id="help-code">
                         <div id="headings" class="help-section">
                             <h2>Headings</h2>
-                            <p>Use the following # before to create headings:</p>
+                            <p>Use the following <code>#</code> before text to create headings:</p>
                             <h1># Heading 1</h1>
                             <h2>## Heading 2</h2>
                             <h3>### Heading 3</h3>
@@ -52,12 +58,11 @@
                         <div id="listing" class="help-section">
                             <h2>Lists</h2>
                             <h3>Unordered List</h3>
-                            <pre><code>use &quot;-&quot; hifin for unorderd list
-        - Item 1
-        - Item 2
-          - Subitem 2.1
-          - Subitem 2.2
-        </code></pre>
+                            <pre><code>- Item 1
+- Item 2
+  - Subitem 2.1
+  - Subitem 2.2
+</code></pre>
                             <ul>
                                 <li>Item 1</li>
                                 <li>Item 2
@@ -68,11 +73,10 @@
                                 </li>
                             </ul>
                             <h3>Ordered List</h3>
-                            <pre><code>use no then dot(.) and space or orderd list
-        1. First item
-        2. Second item
-        3. Third item
-        </code></pre>
+                            <pre><code>1. First item
+2. Second item
+3. Third item
+</code></pre>
                             <ol>
                                 <li>First item</li>
                                 <li>Second item</li>
@@ -83,21 +87,19 @@
                             <h2>Links and Images</h2>
                             <h3>Links</h3>
                             <p>You can create links like this: <a href="https://www.openai.com/">OpenAI</a>.</p>
-                            <pre><code>[Write Name of link](enter link here)
-        </code></pre>
+                            <pre><code>[Link text](URL)</code></pre>
                             <h3>Images</h3>
                             <p><img src="https://example.com/image.jpg" alt="Alt text" title="Optional title" /></p>
-                            <pre><code>![Write text if image not shown](enter url here &quot;enter an optional title&quot;)
-        </code></pre>
+                            <pre><code>![Alt text](URL "Optional title")</code></pre>
                         </div>
                         <div id="code" class="help-section">
                             <h2>Code</h2>
-                            <p>You can include inline code with backticks <code>Write Code Here</code>, or fenced code blocks:</p>
+                            <p>You can include inline code with backticks <code>Inline code</code>, or fenced code blocks:</p>
                             <pre><code class="python">def greet(name):
-    print(f&quot;Hello, {name}!&quot;)
+    print(f"Hello, {name}!")
         
-greet(&quot;World&quot;)
-        </code></pre>
+greet("World")
+</code></pre>
                         </div>
                     </div>
                 </div>
@@ -112,10 +114,7 @@ greet(&quot;World&quot;)
                     </div>
                 </div>
             </div>
-           
         </div>
     </div>
 </div>
-
-
-{%endblock%}
+{% endblock %}
