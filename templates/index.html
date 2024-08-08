@@ -25,6 +25,7 @@ function fetchPosts() {
         .then(data => {
             if (data.status === 200) {
                 renderPosts(data.data.reverse());
+                console.log(data.data.reverse());
 
             } else {
                 alert('Failed to load posts');

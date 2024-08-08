@@ -63,192 +63,40 @@
     <!-- Button triggers for Add Admin and Reset Password -->
     <div class="row mt-4">
         <div class="col-md-12 text-center">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#addAdminModal">Add Admin</button>
-            <button class="btn btn-secondary" data-toggle="modal" data-target="#resetPasswordModal">Reset Password</button>
+            <button class="btn btn-primary" id="addAdminModal">Add Admin</button>
+            <button class="btn btn-secondary" id="resetPasswordModal">Reset Password</button>
         </div>
     </div>
 </div>
 
 <!-- Add Admin Modal -->
-<div class="modal fade" id="addAdminModal" tabindex="-1" role="dialog" aria-labelledby="addAdminModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addAdminModalLabel">Add Admin</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="addAdminForm">
-                    <div class="form-group">
-                        <label for="new-admin-username">Username</label>
-                        <input type="text" class="form-control" id="new-admin-username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new-admin-password">Password</label>
-                        <input type="password" class="form-control" id="new-admin-password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Admin</button>
-                </form>
-                <div class="alert alert-success mt-2" id="add-admin-success" style="display: none;"></div>
-                <div class="alert alert-danger mt-2" id="add-admin-error" style="display: none;"></div>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="adminform" hidden>
+    <div class="header">Add Admin</div>
+    
+        <form id="addAdminForm">
+            <div class="form-group">
+                <label for="new-admin-username">Username</label>
+                <input type="text" class="form-control" id="new-admin-username" required>
 
-<!-- Reset Password Modal -->
-<div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="resetPasswordForm">
-                    <div class="form-group">
-                        <label for="reset-username">Username</label>
-                        <input type="text" class="form-control" id="reset-username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reset-new-password">New Password</label>
-                        <input type="password" class="form-control" id="reset-new-password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Reset Password</button>
-                </form>
-                <div class="alert alert-success mt-2" id="reset-password-success" style="display: none;"></div>
-                <div class="alert alert-danger mt-2" id="reset-password-error" style="display: none;"></div>
-            </div>
-        </div>
+                <label for="new-admin-password">Password</label>
+                <input type="password" class="form-control" id="new-admin-password" required>
+
+                <button type="submit" class="btn btn-primary mt-2">Add Admin</button>
+
+
+           
+        </form>
+
     </div>
-</div>
+
+
+        </div>
+
+
 
 <script>
-    function approveUser(userId) {
-        fetch('/approve_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_id: userId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200) {
-                location.reload(); // Reload the page to see updated data
-            } else {
-                alert('Failed to approve user: ' + data.msg);
-            }
-        })
-        .catch(error => alert('Error approving user: ' + error.message));
-    }
+   
     
-    function denyUser(userId) {
-        fetch('/deny_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_id: userId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200) {
-                location.reload(); // Reload the page to see updated data
-            } else {
-                alert('Failed to deny user: ' + data.msg);
-            }
-        })
-        .catch(error => alert('Error denying user: ' + error.message));
-    }
-    
-    function deleteUser(userId) {
-        fetch('/delete_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_id: userId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200) {
-                location.reload(); // Reload the page to see updated data
-            } else {
-                alert('Failed to delete user: ' + data.msg);
-            }
-        })
-        .catch(error => alert('Error deleting user: ' + error.message));
-    }
-    
-    // Handle Add Admin form submission
-    document.getElementById('addAdminForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        fetch('/add_admin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: document.getElementById('new-admin-username').value,
-                password: document.getElementById('new-admin-password').value
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200) {
-                document.getElementById('add-admin-success').innerText = data.msg;
-                document.getElementById('add-admin-success').style.display = 'block';
-                document.getElementById('add-admin-error').style.display = 'none';
-                setTimeout(() => location.reload(), 2000); // Reload after 2 seconds
-            } else {
-                document.getElementById('add-admin-error').innerText = data.msg;
-                document.getElementById('add-admin-error').style.display = 'block';
-                document.getElementById('add-admin-success').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            document.getElementById('add-admin-error').innerText = 'Error adding admin';
-            document.getElementById('add-admin-error').style.display = 'block';
-            document.getElementById('add-admin-success').style.display = 'none';
-        });
-    });
 
-    // Handle Reset Password form submission
-    document.getElementById('resetPasswordForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        fetch('/reset_password', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: document.getElementById('reset-username').value,
-                new_password: document.getElementById('reset-new-password').value
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 200) {
-                document.getElementById('reset-password-success').innerText = data.msg;
-                document.getElementById('reset-password-success').style.display = 'block';
-                document.getElementById('reset-password-error').style.display = 'none';
-                setTimeout(() => location.reload(), 2000); // Reload after 2 seconds
-            } else {
-                document.getElementById('reset-password-error').innerText = data.msg;
-                document.getElementById('reset-password-error').style.display = 'block';
-                document.getElementById('reset-password-success').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            document.getElementById('reset-password-error').innerText = 'Error resetting password';
-            document.getElementById('reset-password-error').style.display = 'block';
-            document.getElementById('reset-password-success').style.display = 'none';
-        });
-    });
 </script>
 {% endblock %}

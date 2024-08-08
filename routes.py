@@ -176,6 +176,7 @@ def add_admin():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    print(username, password)
     if username and password:
         try:
             admin.add_admin(username, password)
