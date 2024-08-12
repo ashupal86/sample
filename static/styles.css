@@ -62,3 +62,9 @@
 .help-section.active {
     display: block;
 }
+
+
+.list-group-item>p>img{
+    width: 25vw;
+    height: 30vh;
+}
