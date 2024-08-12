@@ -44,7 +44,7 @@
 
 
 ## Additional fixes
-- [ ] posts imgae fix size.
+- [x] posts imgae fix size.
 - [ ] add a good backgorund.
 - [ ] username instead of login and singup button that open profile.
 - [ ] add ceate post button on profile page.
