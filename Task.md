@@ -41,3 +41,25 @@
 ## Resources and References
 - Flask Documentation: [Link](https://flask.palletsprojects.com/)
 - Bootstrap Documentation: [Link](https://getbootstrap.com/)
+
+
+## Additional fixes
+- [ ] posts imgae fix size.
+- [ ] add a good backgorund.
+- [ ] username instead of login and singup button that open profile.
+- [ ] add ceate post button on profile page.
+- [ ] add a button type ui to tags on create post.
+- [ ] 
+
+<!-- ![Alt text](https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg "Optional title")
+
+![Alt text](https://h5p.org/sites/default/files/h5p/content/1209180/images/file-6113d5f8845dc.jpeg "Optional title")
+
+
+```python
+def greet(name): 
+    print(f"Hello, {name}!") 
+greet("World")
+``` -->
+
+

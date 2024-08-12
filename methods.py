@@ -4,6 +4,7 @@ import json
 import datetime
 import os
 from flask import g, current_app, session
+import mistune
 
 DATABASE = 'User.db'
 POSTS_DATABASE_DIR = 'static/POSTS'
@@ -111,8 +112,11 @@ class POSTS:
     def create_post(self, post_title, post_content, post_author, tags):
         self.connect_to_db()
         try:
+            markdown = mistune.create_markdown()
+            html_content = markdown(post_content)
+
             self.cursor.execute("INSERT INTO posts (post_title, post_content, post_author, tags) VALUES (?, ?, ?, ?)", 
-                                (post_title, post_content, post_author, tags))
+                                (post_title, html_content, post_author, tags))
             self.db.commit()
             return json.dumps({"status": 200, "msg": "Post created successfully"})
         except sqlite3.Error as e:
