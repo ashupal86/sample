@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEV BLOGS {% block title %}{% endblock %}</title>
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
@@ -121,7 +124,8 @@
                             <a class="nav-link" href="/contact">Contact</a>
                         </li>
                     </ul>
-                    <a class="btn btn-outline-primary" href="{{ url_for('login') }}">Login & Sign up</a>
+                    <a class="btn btn-outline-primary" id="loginbtn" href="{{ url_for('login') }}">Login</a>
+                    <a href="{{url_for('logout')}}" onclick="logout()" id="logoutbtn" class="btn btn-danger" style=" margin-right:1vw; display:none;" >Log out</a>
                 </div>
             </div>
         </nav>
@@ -130,6 +134,7 @@
     <!-- Full screen navbar -->
     <div class="navbar-fullscreen">
         <span class="close-navbar">&times;</span>
+        <h2>ABlog</h2>
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="/">Home</a>
@@ -141,7 +146,9 @@
                 <a class="nav-link" href="/contact">Contact</a>
             </li>
         </ul>
-        <a class="btn btn-outline-primary" href="{{ url_for('login') }}">Login & Sign up</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('login') }}">Login</a>
+        <a href="{{url_for('logout')}}" onclick="logout()" id="logoutbtn" class="btn btn-danger" style=" margin-right:1vw; display:none;" >Log out</a>
+
     </div>
 
     <div id="flash-message-container">
@@ -164,5 +171,6 @@
     <footer class="text-center mt-4">
         <p>&copy; 2024 ABlog</p>
     </footer>
+    
 </body>
 </html>

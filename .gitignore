@@ -7,3 +7,6 @@ admin_log.txt
 log.txt
 test.py
 test2.py
+static/icons/
+static/manifest.json
+static/service-worker.js

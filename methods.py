@@ -55,35 +55,10 @@ class User:
         except sqlite3.Error as e:
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
-    def logout(self, username):
-        return json.dumps({"status": 200, "msg": "Logout successful"})
+    
 
-    def create_table(self, username):
-        try:
-            db = get_db()
-            cursor = db.cursor()
-            safe_username = f"user_{username}"
-            cursor.execute(f"""
-            CREATE TABLE IF NOT EXISTS {safe_username} (
-                post_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
-            """)
-            db.commit()
-            return json.dumps({"status": 200, "msg": f"Table for {username} created successfully"})
-        except sqlite3.Error as e:
-            return json.dumps({"status": 500, "msg": "Internal server error"})
-
-    def store_post_id(self, username, post_id):
-        try:
-            db = get_db()
-            cursor = db.cursor()
-            safe_username = f"user_{username}"
-            cursor.execute(f"INSERT INTO {safe_username} (post_id) VALUES (?)", (post_id,))
-            db.commit()
-            return json.dumps({"status": 200, "msg": "Post ID stored successfully"})
-        except sqlite3.Error as e:
-            return json.dumps({"status": 500, "msg": "Internal server error"})
-
+    
+   
 class POSTS:
     def __init__(self):
         self.db = None
@@ -129,6 +104,7 @@ class POSTS:
             self.db.commit()
             return json.dumps({"status": 200, "msg": "Post deleted successfully"})
         except sqlite3.Error as e:
+            print(e)
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
     def get_posts(self):
@@ -149,6 +125,15 @@ class POSTS:
                 return json.dumps({"status": 200, "msg": "Post fetched successfully", "data": dict(post)})
             else:
                 return json.dumps({"status": 404, "msg": "Post not found"})
+        except sqlite3.Error as e:
+            return json.dumps({"status": 500, "msg": "Internal server error"})
+        
+    def get_user_posts(self, post_author):
+        self.connect_to_db()
+        try:
+            self.cursor.execute("SELECT * FROM posts WHERE post_author = ? ORDER BY timestamp DESC", (post_author,))
+            posts = self.cursor.fetchall()
+            return json.dumps({"status": 200, "msg": "Posts fetched successfully", "data": [dict(post) for post in posts]})
         except sqlite3.Error as e:
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
