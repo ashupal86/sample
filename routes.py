@@ -31,18 +31,26 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        response = user.login(username, password)
-        result = json.loads(response)
-        if result['status'] == 200:
-            session['credentials'] = username
-            flash('You were successfully logged in', 'success')
+    try:
+    
+        if 'credentials' in session:
             return redirect(url_for('dashboard'))
         else:
-            flash(result['msg'], 'danger')
-    return render_template('login_registration.html')
+            if request.method == 'POST':
+                username = request.form['username']
+                password = request.form['password']
+                response = user.login(username, password)
+                result = json.loads(response)
+                if result['status'] == 200:
+                    session['credentials'] = username
+                    flash('You were successfully logged in', 'success')
+                    return redirect(url_for('dashboard'))
+                else:
+                    flash(result['msg'], 'danger')
+        return render_template('login_registration.html')
+    except Exception as e:
+        flash('Something went Wrong','danger')
+        return redirect('/')
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -63,13 +71,26 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('profile.html')
+    username = session['credentials'] 
+    
+    return render_template('profile.html', username=username)
+
+@app.route('/get_user_post', methods=['POST'])
+def user_post():
+    username = session['credentials']
+    get_posts = posts.get_user_posts(username)
+    data = json.loads(get_posts)
+    # print(data)
+    return jsonify(data)
+
 
 @app.route('/logout')
 def logout():
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
+
+
 
 @app.route('/create_post', methods=['GET', 'POST'])
 @login_required
@@ -96,6 +117,39 @@ def get_posts():
         return jsonify(data)
     else:
         return jsonify({"error": data['msg']})
+    
+# add a route that allow us to share post using post id
+@app.route('/post/<postid>')
+def share(postid):
+    response=posts.get_post_by_id(postid)
+    data=json.loads(response)
+    # print(response.status)
+    return render_template('post.html',post=jsonify(data))
+
+@app.route('/delete_post',methods=['POST'])
+@login_required
+def delete_post():
+    if request.method=="POST":
+        data=request.get_json()
+        post_id=data.get('postid')
+        author=data.get('author')
+        if session['credentials']==author:
+            response=posts.delete_post(post_id)
+            result=json.loads(response)
+            # print(result['msg'])
+            if result['status']==200:
+                flash(result['msg'],'success')
+                return result
+            else:
+                flash(result['msg'],'danger')
+                return result
+        flash('Login First','danger')
+    return redirect(url_for('dashboard'))
+
+    
+
+
+    
 
 # Admin routes
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -120,6 +174,8 @@ def admin_():
     get_users = admin.get_registered_users()
     pending_users = admin.get_pending_users()
     
+
+
     # Convert rows to dictionaries
     get_users_list = [dict(row) for row in get_users]
     pending_users_list = [dict(row) for row in pending_users]
@@ -135,7 +191,7 @@ def approve_user():
     user_id = data.get('user_id')
     if user_id:
         admin.approve_user(user_id)
-        return jsonify({"status": "success"})
+        return jsonify({"status": 200})
     return jsonify({"status": "error", "msg": "Invalid user ID"}), 400
 
 @app.route('/deny_user', methods=['POST'])
@@ -148,7 +204,7 @@ def deny_user():
     if user_id:
         try:
             admin.deny_user(user_id)
-            return jsonify({"status": "success"})
+            return jsonify({"status": 200})
         except Exception as e:
             return jsonify({"status": "error", "msg": str(e)}), 500
     return jsonify({"status": "error", "msg": "Invalid user ID"}), 400
@@ -163,7 +219,7 @@ def delete_user():
     if user_id:
         try:
             admin.delete_user(user_id)
-            return jsonify({"status": "success"})
+            return jsonify({"status": 200})
         except Exception as e:
             return jsonify({"status": "error", "msg": str(e)}), 500
     return jsonify({"status": "error", "msg": "Invalid user ID"}), 400
@@ -206,5 +262,7 @@ def logout_admin():
     session.clear()
     flash('Admin has been logged out', 'info')
     return redirect(url_for('admin_login'))
+
+
 
 

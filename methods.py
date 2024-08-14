@@ -37,6 +37,7 @@ class User:
             cursor.execute("INSERT INTO pending_users (username, hashed_username, password, email, age, phone_number) VALUES (?, ?, ?, ?, ?, ?)",
                             (username, hashed_username, hashed_password, email, age, phone_number))
             db.commit()
+            self.log_activity(f"{username} Registerd")
             return json.dumps({"status": 200, "msg": "Registration request submitted successfully"})
         except sqlite3.IntegrityError:
             return json.dumps({"status": 400, "msg": "Username already exists"})
@@ -50,40 +51,20 @@ class User:
             hashed_password = self.hash_password(password)
             cursor.execute("SELECT * FROM users WHERE hashed_username = ? AND password = ?", (self.hash_password(username), hashed_password))
             if cursor.fetchone():
+                self.log_activity(f'{username} Looged in')
                 return json.dumps({"status": 200, "msg": "Login successful"})
             return json.dumps({"status": 400, "msg": "Invalid username or password"})
         except sqlite3.Error as e:
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
-    def logout(self, username):
-        return json.dumps({"status": 200, "msg": "Logout successful"})
+    def log_activity(self, message):
+        log_file = 'log.txt'
+        with open(log_file, 'a') as f:
+            log_message = f"{datetime.datetime.now()} - {message}\n"
+            f.write(log_message)
 
-    def create_table(self, username):
-        try:
-            db = get_db()
-            cursor = db.cursor()
-            safe_username = f"user_{username}"
-            cursor.execute(f"""
-            CREATE TABLE IF NOT EXISTS {safe_username} (
-                post_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
-            """)
-            db.commit()
-            return json.dumps({"status": 200, "msg": f"Table for {username} created successfully"})
-        except sqlite3.Error as e:
-            return json.dumps({"status": 500, "msg": "Internal server error"})
-
-    def store_post_id(self, username, post_id):
-        try:
-            db = get_db()
-            cursor = db.cursor()
-            safe_username = f"user_{username}"
-            cursor.execute(f"INSERT INTO {safe_username} (post_id) VALUES (?)", (post_id,))
-            db.commit()
-            return json.dumps({"status": 200, "msg": "Post ID stored successfully"})
-        except sqlite3.Error as e:
-            return json.dumps({"status": 500, "msg": "Internal server error"})
-
+    
+   
 class POSTS:
     def __init__(self):
         self.db = None
@@ -105,6 +86,14 @@ class POSTS:
                 tags TEXT NOT NULL,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
             """)
+            self.cursor.execute("""CREATE TABLE IF NOT EXISTS deleted_posts (
+                post_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_title TEXT NOT NULL,
+                post_content TEXT NOT NULL,
+                post_author TEXT NOT NULL,
+                tags TEXT NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
+            """)
             self.db.commit()
         except sqlite3.Error as e:
             self.log_activity("Error initializing POSTS class: " + str(e))
@@ -118,6 +107,7 @@ class POSTS:
             self.cursor.execute("INSERT INTO posts (post_title, post_content, post_author, tags) VALUES (?, ?, ?, ?)", 
                                 (post_title, html_content, post_author, tags))
             self.db.commit()
+            self.log_activity(f"Post created by {post_author}")
             return json.dumps({"status": 200, "msg": "Post created successfully"})
         except sqlite3.Error as e:
             return json.dumps({"status": 500, "msg": "Internal server error"})
@@ -125,10 +115,16 @@ class POSTS:
     def delete_post(self, post_id):
         self.connect_to_db()
         try:
+            # instead of deleting the post move the post to deleted post tabel
+            self.cursor.execute('SELECT * from posts WHERE post_id = ?',(post_id,))
+            post=self.cursor.fetchone()
+            self.cursor.execute('INSERT INTO deleted_posts(post_id, post_title, post_content, post_author, tags, timestamp) VALUES(?,?,?,?,?,?)',(post['post_id'],post['post_title'],post['post_content'],post['post_author'],post['tags'],post['timestamp']))
             self.cursor.execute("DELETE FROM posts WHERE post_id = ?", (post_id,))
             self.db.commit()
+            self.log_activity(f"Post deleted with ID {post_id}")
             return json.dumps({"status": 200, "msg": "Post deleted successfully"})
         except sqlite3.Error as e:
+            # print(e)
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
     def get_posts(self):
@@ -149,6 +145,16 @@ class POSTS:
                 return json.dumps({"status": 200, "msg": "Post fetched successfully", "data": dict(post)})
             else:
                 return json.dumps({"status": 404, "msg": "Post not found"})
+        except sqlite3.Error as e:
+            return json.dumps({"status": 500, "msg": "Internal server error"})
+        
+    def get_user_posts(self, post_author):
+        self.connect_to_db()
+        try:
+            self.cursor.execute("SELECT * FROM posts WHERE post_author = ? ORDER BY timestamp DESC", (post_author,))
+            posts = self.cursor.fetchall()
+            self.log_activity(f"Posts fetched for {post_author}")
+            return json.dumps({"status": 200, "msg": "Posts fetched successfully", "data": [dict(post) for post in posts]})
         except sqlite3.Error as e:
             return json.dumps({"status": 500, "msg": "Internal server error"})
 
@@ -179,6 +185,7 @@ class Admin:
             password TEXT NOT NULL
         )
         """)
+        self.log_activity('System', 'Initialize Admin Table', 'Success')
         cursor.execute("""CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
@@ -188,6 +195,7 @@ class Admin:
                 age INTEGER NOT NULL,
                 phone_number TEXT NOT NULL)
             """)
+        self.log_activity('System', 'Initialize Users Table', 'Success')
         cursor.execute("""CREATE TABLE IF NOT EXISTS pending_users (
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
@@ -198,6 +206,7 @@ class Admin:
                 phone_number TEXT NOT NULL)
             """)
         db.commit()
+        self.log_activity('System', 'Initialize Pending Users Table', 'Success')
         cursor.execute("SELECT COUNT(*) FROM admin_users")
         if cursor.fetchone()[0] == 0:
             self.create_default_admin()
@@ -216,6 +225,7 @@ class Admin:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         db = get_db('User.db')
         cur = db.execute('SELECT * FROM admin_users WHERE username = ? AND password = ?', (username, hashed_password))
+        self.log_activity(username, 'Login', 'Success' if cur.fetchone() else 'Failed')
         return cur.fetchone()
 
     def get_registered_users(self):
@@ -259,6 +269,10 @@ class Admin:
     def delete_user(self, user_id):
         db = get_db('User.db')
         cursor = db.cursor()
+        # instead of deleting the user move the user to pending user tabel
+        cursor.execute('SELECT * from users WHERE user_id = ?',(user_id,))
+        user=cursor.fetchone()
+        cursor.execute('INSERT INTO pending_users(user_id, username, hashed_username, password, email, age, phone_number) VALUES(?,?,?,?,?,?,?)',(user_id,user['username'],user['hashed_username'],user['password'],user['email'],user['age'],user['phone_number']))
         cursor.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
         db.commit()
         self.log_activity(session.get('admin'), f'Delete User ID {user_id}', 'Success')
