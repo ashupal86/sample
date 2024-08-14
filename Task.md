@@ -58,15 +58,28 @@
 - [ ] ~~add another table that store deleted users and you can approve them later~~ 
 - [x] ~~moving them back to pending_users table~~
 - [ ] add a section where all the tech event will be displayed only
-- [ ] add edit post option
+
 
 
 ## Additional features
 - [ ] add a badge section on profile for registered users give them some badges like gihub
+- [ ] design the user-profile on clicking their username
+- [ ] display their deleted posts on their profile and they can ask the admin to repost.
+
+- [ ] `V2 Feature`edit function for their posts.
 
 ## User POST performance criteria
 - [ ] give them star on the basis of their posting performance
 - [ ] user should fill a g form for deleting their account
+
+
+
+## Admin Control features
+- [ ] seperate button to display the pending_user and registerd users.
+- [ ] on clicking registerd user it should open user profile where i can see all the posts and user detaails.
+- [ ] on admin page add a button to view all the post and delete the post. 
+- [ ] account verification using email link.
+- [ ] 
 
 
 
