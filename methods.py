@@ -244,6 +244,10 @@ class Admin:
     def delete_user(self, user_id):
         db = get_db('User.db')
         cursor = db.cursor()
+        # instead of deleting the user move the user to pending user tabel
+        cursor.execute('SELECT * from users WHERE user_id = ?',(user_id,))
+        user=cursor.fetchone()
+        cursor.execute('INSERT INTO pending_users(user_id, username, hashed_username, password, email, age, phone_number) VALUES(?,?,?,?,?,?,?)',(user_id,user['username'],user['hashed_username'],user['password'],user['email'],user['age'],user['phone_number']))
         cursor.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
         db.commit()
         self.log_activity(session.get('admin'), f'Delete User ID {user_id}', 'Success')

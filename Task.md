@@ -55,8 +55,10 @@
 - [x] ~~add ceate post button on profile page.~~
 - [ ] add a button type ui to tags on create post.
 - [ ] also add the logout btn and username instead of login and singup in mobile view
-- [ ] add another table that store deleted users and you can approve them later 
+- [ ] ~~add another table that store deleted users and you can approve them later~~ 
+- [x] ~~moving them back to pending_users table~~
 - [ ] add a section where all the tech event will be displayed only
+- [ ] add edit post option
 
 
 ## Additional features
