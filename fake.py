@@ -13,12 +13,12 @@ cursor = conn.cursor()
 # Create the posts table if it doesn't exist
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY,
-    post_title TEXT,
-    post_content TEXT,
-    post_author TEXT,
-    tags TEXT
-)
+                post_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                post_title TEXT NOT NULL,
+                post_content TEXT NOT NULL,
+                post_author TEXT NOT NULL,
+                tags TEXT NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)
 ''')
 
 # Sample data (titles, authors, and tags)
