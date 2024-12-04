@@ -213,7 +213,7 @@ class Admin:
 
     def create_default_admin(self):
         default_username = 'admin'
-        default_password = 'admin_password'  # Replace with a secure default password
+        default_password = 'admin@ashu'  # Replace with a secure default password
         hashed_password = hashlib.sha256(default_password.encode()).hexdigest()
         db = get_db('User.db')
         cursor = db.cursor()
@@ -225,6 +225,7 @@ class Admin:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         db = get_db('User.db')
         cur = db.execute('SELECT * FROM admin_users WHERE username = ? AND password = ?', (username, hashed_password))
+        print(username, hashed_password)
         self.log_activity(username, 'Login', 'Success' if cur.fetchone() else 'Failed')
         return cur.fetchone()
 
